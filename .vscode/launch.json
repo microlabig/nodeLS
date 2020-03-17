@@ -11,7 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\main.js foods sort_foods"
+            "program": "${workspaceFolder}\\main.js",
+            "args": ["foods","sort_foods","--d"]
         }
     ]
 }

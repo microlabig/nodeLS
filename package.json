@@ -13,6 +13,7 @@
   "dependencies": {
     "directory-tree": "^2.2.4",
     "eslint-config-standard": "^14.1.0",
+    "fs-extra": "^8.1.0",
     "minimist": "^1.2.5"
   },
   "devDependencies": {
