@@ -1,11 +1,7 @@
-/* eslint-disable */
 const fs = require('fs');
-const fse = require('fs-extra');
 const path = require('path');
-const util = require('util');
 const argv = require('minimist')(process.argv.slice(2)); // читаем аргументы
 const folders = [...argv._]; // названия папок в src
-const rename = util.promisify(fs.rename); // делаем из ф-ии колбека ф-ию промис
 
 const deleteSourceFolder = argv.d || false; // признак удаления исходной папки
 
@@ -27,7 +23,7 @@ const readDir = (scanPath) => {
 
   if (files.length === 0) {
     // если пустой каталог - удалим его
-    fs.rmdirSync(scanPath);
+    deleteEmptyFolder(scanPath);
   } else {
     // переберем файлы в текущей директории
     files.forEach(file => {
@@ -37,28 +33,35 @@ const readDir = (scanPath) => {
       if (state.isDirectory()) {
         // если текущий "файл" по типу директория - перейдем в нее
         readDir(currentPath);
-        // удалим текущую пустую директорию
-        if (fs.existsSync(currentPath)) {
-          deleteEmptyFolder(currentPath);
-        }
-      } else {
-        (async () => {
-          try {
-            const firstLetter = file[0].toUpperCase() || 'OTHER'; // первый символ файла
-            const pathTo = path.join(TO, firstLetter); // путь к новому расположению файла
-            const newPath = path.join(pathTo, file); // новое имя и путь файла
-
-            // проверяем - существует ли такая папка с названием первой буквы в каталоге
-            if (!fs.existsSync(pathTo)) {
-              fs.mkdirSync(pathTo); // если нет - создать каталог
-            }
-            // переместим файл в папку с названием первой буквы в каталоге
-            await rename(currentPath, newPath);
-          } catch (error) {
-            // обработаем ошибки
-            errorMessage(error);
+        setImmediate(() => {
+          // удалим текущую пустую директорию
+          if (fs.existsSync(currentPath)) {
+            deleteEmptyFolder(currentPath);
           }
-        })();
+        });
+      } else {
+        const firstLetter = file[0].toUpperCase() || 'OTHER'; // первый символ файла
+        const pathTo = path.join(TO, firstLetter); // путь к новому расположению файла
+        const newPath = path.join(pathTo, file); // новое имя и путь файла
+
+        // проверяем - существует ли такая папка с названием первой буквы в каталоге
+        if (!fs.existsSync(pathTo)) {
+          fs.mkdirSync(pathTo); // если нет - создать каталог
+        }
+        // переместим файл в папку с названием первой буквы в каталоге
+        fs.rename(currentPath, newPath, (err) => {
+          // обработаем ошибки
+          setImmediate(() => {
+            errorMessage(err);
+          });
+          
+          setImmediate(() => {
+            // удалим текущую пустую директорию
+            if (fs.existsSync(scanPath)) {
+              deleteEmptyFolder(scanPath);
+            }
+          });
+        });
       }
     });
   }
@@ -82,8 +85,6 @@ const deleteEmptyFolder = (path) => {
 // ------------------------
 const errorMessage = (err) => {
   if (err) {
-    console.log(error);
-    
     console.error(err.message);
     process.exit(1);
   }
@@ -95,8 +96,9 @@ if (!fs.existsSync(TO)) {
 }
 // читаем исходный каталог и перемещаем файлы
 readDir(FROM);
-// удалим исходный каталог
-if (deleteSourceFolder) {
-  // fs.rmdirSync(FROM);
-  fse.removeSync(FROM);
-}
+setImmediate(() => {
+  // удалим исходный каталог
+  if (deleteSourceFolder) {
+    fs.rmdirSync(FROM);
+  }
+});
