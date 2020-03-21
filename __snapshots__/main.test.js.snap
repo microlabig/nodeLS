@@ -1,12 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`app create snapshot 1`] = `""`;
+exports[`app: file system create snapshot 1`] = `""`;
 
-exports[`app creates sorted files 1`] = `
+exports[`app: file system creates sorted files 1`] = `
 Object {
   "children": Array [
     Object {
       "children": Array [
+        Object {
+          "extension": ".txt",
+          "name": "file0.txt",
+          "path": "src\\\\from\\\\file0.txt",
+          "size": 14,
+          "type": "file",
+        },
         Object {
           "children": Array [
             Object {
@@ -55,13 +62,13 @@ Object {
       ],
       "name": "from",
       "path": "src\\\\from",
-      "size": 42,
+      "size": 56,
       "type": "directory",
     },
   ],
   "name": "src",
   "path": "./src",
-  "size": 42,
+  "size": 56,
   "type": "directory",
 }
 `;

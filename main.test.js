@@ -6,7 +6,7 @@ const mock = require("mock-fs");
 
 const APP_PATH = require.resolve("./main");
 
-describe("app", () => {
+describe("app: file system", () => {
     beforeEach(() => {
         mock({
             './src': mock.directory({
@@ -20,7 +20,8 @@ describe("app", () => {
                             inner_folder: {
                                 'file3.txt': "text content 3"
                             }
-                        }
+                        },
+                        'file0.txt': "text content 0"
                     }
                 }
 
@@ -30,19 +31,19 @@ describe("app", () => {
     afterEach(mock.restore);
 
     it("create snapshot", async () => {
-        const stdout = await runCommand(`${APP_PATH} from to`);
-        
+        const stdout = await runCommand(`${APP_PATH} from to --d`);
+
         mock.restore();
         expect(stdout).toMatchSnapshot();
     });
 
     it("creates sorted files", async () => {
-        await runCommand(`${APP_PATH} from to`);
+        await runCommand(`${APP_PATH} from to --d`);
         const tree = dirTree("./src");
-        
+
         mock.restore();
         console.log(tree);
-        
+
         expect(tree).toMatchSnapshot();
     });
 });
