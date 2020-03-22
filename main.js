@@ -97,6 +97,7 @@ try {
   }
   // читаем исходный каталог и перемещаем файлы
   readDirAndMoveFiles(FROM);
+  console.log('Suuccess');
 } catch (error) {
   errorMessage(error);
 }

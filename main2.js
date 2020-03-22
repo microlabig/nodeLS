@@ -97,6 +97,7 @@ const errorMessage = (err) => {
     }
     // читаем исходный каталог и перемещаем файлы
     await readDirAndMoveFiles(FROM);
+    console.log('Suuccess');
   } catch (error) {
     errorMessage(error);
   }
