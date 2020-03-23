@@ -6,6 +6,26 @@ const mock = require("mock-fs");
 
 const APP_PATH = require.resolve("./main");
 
+const delay = (ms) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms);
+    });
+};
+
+function format(entry) {
+    if (typeof entry === "object") {
+        try {
+            return JSON.stringify(entry);
+        } catch (e) { }
+    }
+
+    return entry;
+}
+
+function log(...msgs) {
+    process.stdout.write(msgs.map(format).join(" ") + "\n");
+}
+
 describe("app: file system", () => {
     beforeEach(() => {
         mock({
@@ -39,11 +59,17 @@ describe("app: file system", () => {
 
     it("creates sorted files", async () => {
         await runCommand(`${APP_PATH} from to --d`);
-        const tree = dirTree("./src");
+        await delay(2000);
 
+        const tree = dirTree("./src", {}, null, (item, PATH, stats) => {
+            //console.log(item);
+        });
+
+        log(tree);
+        log('---');
+        log(await runCommand(`cd ./src && ls -la`));
+        //console.log(tree);
         mock.restore();
-        console.log(tree);
-
         expect(tree).toMatchSnapshot();
     });
 });
