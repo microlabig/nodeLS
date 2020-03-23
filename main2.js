@@ -34,7 +34,7 @@ const readDirAndMoveFiles = async (scanPath) => {
 
       if (state.isDirectory()) {
         // если текущий "файл" по типу директория - перейдем в нее
-        readDirAndMoveFiles(currentPath);
+        await readDirAndMoveFiles(currentPath);
         // удалим текущую пустую директорию
         if (fs.existsSync(currentPath)) {
           deleteEmptyFolder(currentPath);

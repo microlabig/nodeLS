@@ -37,7 +37,7 @@ describe("app", () => {
 
     it("create snapshot", async () => {
         const stdout = await runCommand(`${APP_PATH} from to`);
-        
+
         mock.restore();
         expect(stdout).toMatchSnapshot();
     });
@@ -45,11 +45,11 @@ describe("app", () => {
     it("creates sorted files", async () => {
         await runCommand(`${APP_PATH} from to`);
         const tree = dirTree("./src");
-        
+
         await delay(3000);
         mock.restore();
         console.log(tree);
-        
+
         expect(tree).toMatchSnapshot();
     });
 });

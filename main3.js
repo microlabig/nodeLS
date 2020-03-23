@@ -1,3 +1,4 @@
+/* eslint-disable */
 const config = require('dotenv').config();
 const http = require('http');
 
