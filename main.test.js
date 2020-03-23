@@ -64,11 +64,9 @@ describe("app: file system", () => {
         const tree = dirTree("./src", {}, null, (item, PATH, stats) => {
             //console.log(item);
         });
-
         log(tree);
-        log('---');
-        log(await runCommand(`cd ./src && ls -la`));
         //console.log(tree);
+
         mock.restore();
         expect(tree).toMatchSnapshot();
     });
