@@ -6,6 +6,12 @@ const mock = require("mock-fs");
 
 const APP_PATH = require.resolve("./main");
 
+const delay = (ms) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms);
+    })
+}
+
 describe("app", () => {
     beforeEach(() => {
         mock({
@@ -40,6 +46,7 @@ describe("app", () => {
         await runCommand(`${APP_PATH} from to`);
         const tree = dirTree("./src");
         
+        await delay(3000);
         mock.restore();
         console.log(tree);
         
