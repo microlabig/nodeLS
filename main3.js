@@ -11,9 +11,9 @@ const INTERVAL = process.env.INTERVAL
   ? parseInt(process.env.INTERVAL)
   : parseInt(config.parsed.INTERVAL);
 // лимит таймера (количество тиков)
-const DELAY = process.env.DELAY
-  ? parseInt(process.env.DELAY)
-  : parseInt(config.parsed.DELAY);
+const TIMEOUT = process.env.TIMEOUT
+  ? parseInt(process.env.TIMEOUT)
+  : parseInt(config.parsed.TIMEOUT);
   
 // ---------------
 // Создаем сервер
@@ -28,6 +28,7 @@ const server = http
     if (err) {
       throw new Error(err.message);
     }
+    console.log(`TIMEOUT=${TIMEOUT/1000}s, INTERVAL=${INTERVAL/1000}s`);
     console.log(`HTTP-cервер стартовал на порту ${PORT}`);
   });
 
@@ -37,8 +38,9 @@ const server = http
 server.on('request', (req, res) => {
   const isOnlyHtmlRequest = req.headers.accept.indexOf('text/html', 0);
   const method = req.method;
+  const url = req.url
 
-  if (method === 'GET' && isOnlyHtmlRequest !== -1) {
+  if (method === 'GET' && isOnlyHtmlRequest !== -1 && url === '/') {
       let date = new Date().toUTCString();
 
       const timer = setInterval(() => {
@@ -49,9 +51,9 @@ server.on('request', (req, res) => {
       setTimeout(() => {
         clearInterval(timer);
         res.write(date);
-        console.log('close');
+        console.log(date);
         res.end();
-      }, DELAY);
+      }, TIMEOUT);
   }
 });
 
