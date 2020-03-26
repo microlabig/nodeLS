@@ -15,10 +15,10 @@ const TIMEOUT = process.env.TIMEOUT
   ? parseInt(process.env.TIMEOUT)
   : parseInt(config.parsed.TIMEOUT);
 
-let connections = [];
-let timer = null;
-let isRunning = false;
-let date = null;
+const connections = []; // список соединений
+let timer = null; // ИД интервального таймера
+let isRunning = false; // признак запуска интервального таймера
+let date = null; // текущая дата
 
 // ---------------
 // Создаем сервер
@@ -59,7 +59,7 @@ server.on('request', (req, res) => {
         }
       }, INTERVAL);
 
-      setTimeout(function stop() {
+      setTimeout(function stop () {
         connections[0].write(date);
         connections[0].end();
         connections.splice(0, 1);
