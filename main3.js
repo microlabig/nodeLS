@@ -1,4 +1,4 @@
-/* eslint-disable */
+// /* eslint-disable */
 const config = require('dotenv').config();
 const http = require('http');
 
@@ -14,7 +14,12 @@ const INTERVAL = process.env.INTERVAL
 const TIMEOUT = process.env.TIMEOUT
   ? parseInt(process.env.TIMEOUT)
   : parseInt(config.parsed.TIMEOUT);
-  
+
+let connections = [];
+let timer = null;
+let isRunning = false;
+let date = null;
+
 // ---------------
 // Создаем сервер
 // ---------------
@@ -28,7 +33,7 @@ const server = http
     if (err) {
       throw new Error(err.message);
     }
-    console.log(`TIMEOUT=${TIMEOUT/1000}s, INTERVAL=${INTERVAL/1000}s`);
+    console.log(`TIMEOUT=${TIMEOUT / 1000}s, INTERVAL=${INTERVAL / 1000}s`);
     console.log(`HTTP-cервер стартовал на порту ${PORT}`);
   });
 
@@ -38,22 +43,32 @@ const server = http
 server.on('request', (req, res) => {
   const isOnlyHtmlRequest = req.headers.accept.indexOf('text/html', 0);
   const method = req.method;
-  const url = req.url
+  const url = req.url;
 
   if (method === 'GET' && isOnlyHtmlRequest !== -1 && url === '/') {
-      let date = new Date().toUTCString();
+    connections.push(res);
 
-      const timer = setInterval(() => {
+    if (!isRunning) {
+      isRunning = true;
+      
+      timer = setInterval(() => {
         date = new Date().toUTCString();
         console.log(date);
+        if (connections.length === 0) {
+          clearInterval(timer);
+          isRunning = false;
+        }
       }, INTERVAL);
 
-      setTimeout(() => {
-        clearInterval(timer);
-        res.write(date);
-        console.log(date);
-        res.end();
+      setTimeout(function stop() {
+        connections[0].write(date);
+        connections[0].end();
+        connections.splice(0, 1);
+        if (connections.length > 0) {
+          setTimeout(stop, TIMEOUT);
+        }
       }, TIMEOUT);
+    }
   }
 });
 
@@ -69,6 +84,6 @@ server.on('clientError', (err, socket) => {
 // Обрабатываем прочие ошибки
 // ---------------------------
 process.on('error', err => {
-  console.log(err.message);
+  console.error(err.message);
   server.close();
 });
