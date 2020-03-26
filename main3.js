@@ -50,7 +50,6 @@ server.on('request', (req, res) => {
 
     if (!isRunning) {
       isRunning = true;
-      
       timer = setInterval(() => {
         date = new Date().toUTCString();
         console.log(date);
