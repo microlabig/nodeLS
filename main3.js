@@ -15,7 +15,6 @@ const TIMEOUT = process.env.TIMEOUT
   ? parseInt(process.env.TIMEOUT)
   : parseInt(config.parsed.TIMEOUT);
 
-const connections = []; // список соединений
 let timer = null; // ИД интервального таймера
 let isRunning = false; // признак запуска интервального таймера
 let date = null; // текущая дата
@@ -46,27 +45,21 @@ server.on('request', (req, res) => {
   const url = req.url;
 
   if (method === 'GET' && isOnlyHtmlRequest !== -1 && url === '/') {
-    connections.push(res);
-
     if (!isRunning) {
+      let tick = 0;
+
       isRunning = true;
       timer = setInterval(() => {
         date = new Date().toUTCString();
         console.log(date);
-        if (connections.length === 0) {
-          clearInterval(timer);
+        tick += INTERVAL;
+        if (tick >= TIMEOUT) {
           isRunning = false;
+          res.write(date);
+          res.end();
+          clearInterval(timer);
         }
       }, INTERVAL);
-
-      setTimeout(function stop () {
-        connections[0].write(date);
-        connections[0].end();
-        connections.splice(0, 1);
-        if (connections.length > 0) {
-          setTimeout(stop, TIMEOUT);
-        }
-      }, TIMEOUT);
     }
   }
 });
@@ -76,7 +69,7 @@ server.on('request', (req, res) => {
 // ----------------------------
 server.on('clientError', (err, socket) => {
   console.log(err.message);
-  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  socket.end('HTTP/1.1 400 Bad Request\r\n');
 });
 
 // ---------------------------
