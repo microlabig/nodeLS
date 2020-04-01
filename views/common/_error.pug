@@ -10,5 +10,6 @@ header.header
               a.social__link(href="http://")
                 i(class=`fab ${item}`)
     .header__content
-      h1.header__title Упс... Ошибка #{message}
+      h1.header__title Упс... Ошибка:
+      p(style="color: white; font-size: 2em;") #{status} #{message}
       a(href="/").header__link На главную
