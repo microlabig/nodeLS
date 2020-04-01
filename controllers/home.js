@@ -1,9 +1,10 @@
 const db = require('../store');
-const { getValues } = require('../store/skills');
+const { getSkills } = require('../store/skills');
+const { getProducts } = require('../store/products');
 
 module.exports.get = (req, res) => {
   // req.session.isAuth = false;
-  res.render('index', { skills: getValues(db) });
+  res.render('index', { products: getProducts(db), skills: getSkills(db) });
 };
 
 module.exports.post = (req, res) => {

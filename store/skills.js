@@ -1,4 +1,4 @@
-module.exports.getValues = db => {
+module.exports.getSkills = db => {
   return db
     .get('skills')
     .value()
@@ -12,7 +12,7 @@ module.exports.getValues = db => {
     });
 };
 
-module.exports.getNumbers = db => {
+module.exports.getSkillValues = db => {
   return {
     age: db
       .get('skills')
@@ -37,7 +37,7 @@ module.exports.getNumbers = db => {
   };
 };
 
-module.exports.setValues = (db, arr) => {
+module.exports.setSkills = (db, arr) => {
   // arr = [{id, number}, ...]
   for (const item of arr) {
     db.get('skills')

@@ -22,6 +22,6 @@ router.post('/login', ctrlLogin.post);
 router.get('/admin', isAuth, ctrlAdmin.get);
 router.get('/admin(.html?)?$/', isAuth, (req, res) => res.redirect('/admin'));
 router.post('/admin/skills', ctrlAdmin.skills);
-router.post('/admin/upload', ctrlAdmin.upload);
+router.post('/admin/upload', ctrlAdmin.product);
 
 module.exports = router;
