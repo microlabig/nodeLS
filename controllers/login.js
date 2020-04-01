@@ -4,13 +4,13 @@ module.exports.get = (req, res) => {
 
 module.exports.post = (req, res) => {
   const { email, password } = req.body;
-  const checkFields = !email || !password;
-  const flashMessage = checkFields
+  const isValid = !email || !password;
+  const flashMessage = isValid
     ? 'Ошибка ввода данных! Все поля обязательны для заполнения!'
     : 'Форма отправлена успешно!';
 
   req.flash('msgslogin', flashMessage);
-  if (checkFields) {
+  if (isValid) {
     res.render('login', req.flash('msgslogin'));
   } else {
     console.log(req.body);

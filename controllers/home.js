@@ -1,12 +1,15 @@
+const db = require('../store');
+const { getValues } = require('../store/skills');
+
 module.exports.get = (req, res) => {
   // req.session.isAuth = false;
-  res.render('index', {});
+  res.render('index', { skills: getValues(db) });
 };
 
 module.exports.post = (req, res) => {
   const { name, email, message } = req.body;
-  const checkFields = !name || !email || !message;
-  const flashMessage = checkFields
+  const isValid = !name || !email || !message;
+  const flashMessage = isValid
     ? 'Ошибка ввода данных! Все поля обязательны для заполнения!'
     : 'Форма отправлена успешно!';
 
