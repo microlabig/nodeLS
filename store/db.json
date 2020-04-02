@@ -2,7 +2,7 @@
   "skills": [
     {
       "id": "age",
-      "number": 5,
+      "number": 65,
       "text": "Возраст начала занятий на скрипке"
     },
     {
@@ -68,9 +68,19 @@
       "price": 600
     },
     {
-      "name": "Повязка",
-      "price": "1000",
+      "name": "1",
+      "price": "2",
       "src": "assets\\img\\products\\nHQIgnQ9gyg.jpg"
+    },
+    {
+      "name": "3",
+      "price": "4",
+      "src": "assets\\img\\products\\others.jpg"
+    },
+    {
+      "name": "asdf",
+      "price": "2",
+      "src": "assets\\img\\products\\avatar.jpg"
     }
   ]
 }

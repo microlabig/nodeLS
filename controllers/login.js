@@ -1,21 +1,20 @@
-module.exports.get = (req, res) => {
-  res.render('login', {});
+module.exports.get = async (ctx, next) => {
+  return await ctx.render('login', {});
 };
 
-module.exports.post = (req, res) => {
-  const { email, password } = req.body;
+module.exports.post = async (ctx, next) => {
+  const { email, password } = ctx.request.body;
   const isValid = !email || !password;
   const flashMessage = isValid
     ? 'Ошибка ввода данных! Все поля обязательны для заполнения!'
     : 'Форма отправлена успешно!';
 
-  req.flash('msgslogin', flashMessage);
+  ctx.flash('msgslogin', flashMessage);
   if (isValid) {
-    res.render('login', req.flash('msgslogin'));
+    await ctx.render('login', { msgslogin: ctx.flash('msgslogin') });
   } else {
-    console.log(req.body);
-    req.session.isAuth = true;
-    res.redirect('/admin');
+    console.log(ctx.request.body);
+    ctx.session.isAuth = true;
+    await ctx.redirect('/admin');
   }
-  res.locals.msgslogin = null;
 };

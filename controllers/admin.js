@@ -5,12 +5,12 @@ const db = require('../store');
 const { setSkills } = require('../store/skills');
 const { setProduct } = require('../store/products');
 
-module.exports.get = (req, res) => {
-  res.render('admin', {});
+module.exports.get = async (ctx, next) => {
+  return await ctx.render('admin', {});
 };
 
-module.exports.skills = (req, res) => {
-  const { age, concerts, cities, years } = req.body;
+module.exports.skills = async (ctx, next) => {
+  const { age, concerts, cities, years } = ctx.request.body;
   const isValid =
     age !== '' && concerts !== '' && cities !== '' && years !== '';
   const flashMessage = !isValid
@@ -21,23 +21,21 @@ module.exports.skills = (req, res) => {
   if (isValid) {
     setSkills(
       db,
-      Object.keys(req.body).map((item, index) => {
+      Object.keys(ctx.request.body).map((item, index) => {
         return {
           id: item,
-          number: Object.values(req.body)[index]
+          number: Object.values(ctx.request.body)[index]
         };
       })
     );
   }
 
-  req.flash('msgskill', flashMessage);
-  res.locals.msgskill = req.flash('msgskill');
-  res.render('admin', req.flash('msgskill'));
-  console.log(req.body);
-  res.locals.msgslogin = null;
+  ctx.flash('msgskill', flashMessage);
+  console.log(ctx.request.body);
+  return await ctx.render('admin', { msgskill: ctx.flash('msgskill') });
 };
 
-module.exports.product = (req, res, next) => {
+module.exports.product = async (ctx, next) => {
   // входные данные
   const form = new formidable.IncomingForm();
   // папка загрузки
@@ -45,38 +43,48 @@ module.exports.product = (req, res, next) => {
   // сформируем полный путь до папки загрузки
   form.uploadDir = path.join(process.cwd(), upload);
   // распарсим входные данные
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      return next(err);
-    }
 
-    const { name, price } = fields;
-    const isValid = files && name !== '' && price !== '';
-    const flashMessage = !isValid
-      ? 'Ошибка ввода данных! Все поля обязательны для заполнения!'
-      : 'Форма отправлена успешно!';
-
-    req.flash('msgfile', flashMessage);
-    res.locals.msgfile = req.flash('msgfile');
-    res.render('admin', req.flash('msgfile'));
-    console.log({ ...fields, photo: files.photo.name });
-    res.locals.msgfile = null;
-
-    // если все данные валидны, запишем в базу
-    if (isValid) {
-      // путь, относительно корневой директории
-      const fileName = path.join(upload, files.photo.name);
-      // переименуем файл со случайно сгенерированным именем в имя, которое клиент отправил
-      fs.rename(files.photo.path, path.join(process.cwd(), fileName), err => {
+  try {
+    await new Promise((resolve, reject) => {
+      form.parse(ctx.req, (err, fields, files) => {
         if (err) {
-          console.error(err.message);
-          return;
+          reject(err);
+          return next(err);
         }
-        // взять оставшуюся часть пути, начиная с assets
-        const src = fileName.substr(fileName.indexOf('assets'));
-        // запишем в базу
-        setProduct(db, { ...fields, src });
+
+        const { name, price } = fields;
+        const isValid = files && name !== '' && price !== '';
+        const flashMessage = !isValid
+          ? 'Ошибка ввода данных! Все поля обязательны для заполнения!'
+          : 'Форма отправлена успешно!';
+
+        ctx.flash('msgfile', flashMessage);
+        console.log({ ...fields, photo: files.photo.name });
+
+        // путь, относительно корневой директории
+        const fileName = path.join(upload, files.photo.name);
+
+        // переименуем файл со случайно сгенерированным именем в имя, которое клиент отправил
+        fs.rename(files.photo.path, path.join(process.cwd(), fileName), err => {
+          if (err) {
+            reject(err);
+            console.error(err.message);
+            return;
+          }
+          // если все данные валидны, запишем в базу
+          if (isValid) {
+            // взять оставшуюся часть пути, начиная с assets
+            const src = fileName.substr(fileName.indexOf('assets'));
+            // запишем в базу
+            setProduct(db, { ...fields, src });
+          }
+          resolve();
+        });
       });
-    }
-  });
+    });
+  } catch (error) {
+    ctx.throw(error);
+  } finally {
+    await ctx.render('admin', { msgfile: ctx.flash('msgfile') });
+  }
 };
