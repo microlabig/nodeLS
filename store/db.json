@@ -7,17 +7,17 @@
     },
     {
       "id": "concerts",
-      "number": 6,
+      "number": 62,
       "text": "Концертов отыграл"
     },
     {
       "id": "cities",
-      "number": 7,
+      "number": 82,
       "text": "Максимальное число городов в туре"
     },
     {
       "id": "years",
-      "number": 8,
+      "number": 81,
       "text": "Лет на сцене в качестве скрипача"
     }
   ],
@@ -66,21 +66,6 @@
       "src": "./assets/img/products/Work9.jpg",
       "name": "Вино вдохновение",
       "price": 600
-    },
-    {
-      "name": "1",
-      "price": "2",
-      "src": "assets\\img\\products\\nHQIgnQ9gyg.jpg"
-    },
-    {
-      "name": "3",
-      "price": "4",
-      "src": "assets\\img\\products\\others.jpg"
-    },
-    {
-      "name": "asdf",
-      "price": "2",
-      "src": "assets\\img\\products\\avatar.jpg"
     }
   ]
 }

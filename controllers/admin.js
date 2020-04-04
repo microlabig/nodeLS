@@ -2,11 +2,11 @@ const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
 const db = require('../store');
-const { setSkills } = require('../store/skills');
+const { getSkillValues, setSkills } = require('../store/skills');
 const { setProduct } = require('../store/products');
 
 module.exports.get = async (ctx, next) => {
-  return await ctx.render('admin', {});
+  return await ctx.render('admin', { skills: getSkillValues(db) });
 };
 
 module.exports.skills = async (ctx, next) => {
@@ -32,7 +32,10 @@ module.exports.skills = async (ctx, next) => {
 
   ctx.flash('msgskill', flashMessage);
   console.log(ctx.request.body);
-  return await ctx.render('admin', { msgskill: ctx.flash('msgskill') });
+  return await ctx.render('admin', {
+    skills: getSkillValues(db),
+    msgskill: ctx.flash('msgskill')
+  });
 };
 
 module.exports.product = async (ctx, next) => {
@@ -85,6 +88,9 @@ module.exports.product = async (ctx, next) => {
   } catch (error) {
     ctx.throw(error);
   } finally {
-    await ctx.render('admin', { msgfile: ctx.flash('msgfile') });
+    await ctx.render('admin', {
+      skills: getSkillValues(db),
+      msgfile: ctx.flash('msgfile')
+    });
   }
 };
