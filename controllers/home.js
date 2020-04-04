@@ -16,11 +16,11 @@ module.exports.post = (req, res) => {
 
   // инициализируем flash-сообщение
   req.flash('msgsemail', flashMessage);
-  // записываем flash-сообщение
-  res.locals.msgsemail = req.flash('msgsemail');
   // рендерим страницу с flash-сообщением
-  res.render('index', req.flash('msgsemail'));
+  res.render('index', {
+    products: getProducts(db),
+    skills: getSkills(db),
+    msgsemail: req.flash('msgsemail')
+  });
   console.log(req.body);
-  // очищаем flash-сообщение для данной страницы
-  res.locals.msgsemail = null;
 };

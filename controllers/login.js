@@ -11,11 +11,10 @@ module.exports.post = (req, res) => {
 
   req.flash('msgslogin', flashMessage);
   if (isValid) {
-    res.render('login', req.flash('msgslogin'));
+    res.render('login', { msgslogin: req.flash('msgslogin') });
   } else {
     console.log(req.body);
     req.session.isAuth = true;
     res.redirect('/admin');
   }
-  res.locals.msgslogin = null;
 };

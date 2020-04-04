@@ -2,11 +2,11 @@ const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
 const db = require('../store');
-const { setSkills } = require('../store/skills');
+const { getSkillValues, setSkills } = require('../store/skills');
 const { setProduct } = require('../store/products');
 
 module.exports.get = (req, res) => {
-  res.render('admin', {});
+  res.render('admin', { skills: getSkillValues(db) });
 };
 
 module.exports.skills = (req, res) => {
@@ -31,10 +31,11 @@ module.exports.skills = (req, res) => {
   }
 
   req.flash('msgskill', flashMessage);
-  res.locals.msgskill = req.flash('msgskill');
-  res.render('admin', req.flash('msgskill'));
+  res.render('admin', {
+    skills: getSkillValues(db),
+    msgskill: req.flash('msgskill')
+  });
   console.log(req.body);
-  res.locals.msgslogin = null;
 };
 
 module.exports.product = (req, res, next) => {
@@ -57,10 +58,11 @@ module.exports.product = (req, res, next) => {
       : 'Форма отправлена успешно!';
 
     req.flash('msgfile', flashMessage);
-    res.locals.msgfile = req.flash('msgfile');
-    res.render('admin', req.flash('msgfile'));
+    res.render('admin', {
+      skills: getSkillValues(db),
+      msgfile: req.flash('msgfile')
+    });
     console.log({ ...fields, photo: files.photo.name });
-    res.locals.msgfile = null;
 
     // если все данные валидны, запишем в базу
     if (isValid) {

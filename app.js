@@ -31,10 +31,6 @@ app.use(
   })
 );
 app.use(flash());
-// app.use((req, res, next) => {
-//   res.locals.msgsemail = req.flash("msgsemail");
-//   next();
-// });
 
 // статика
 app.use(express.static(path.join(__dirname, 'static')));
