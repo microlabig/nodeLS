@@ -2,7 +2,7 @@
     "verbose": true,
     "ignore": [
         "*.json",
-        "./static/**/*"
+        "./public/"
     ],
     "execMap": {}
 }

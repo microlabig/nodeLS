@@ -2,28 +2,18 @@ const express = require('express');
 const router = express.Router();
 
 const ctrlHome = require('../controllers/home');
-// const ctrlLogin = require('../controllers/login');
-// const ctrlAdmin = require('../controllers/admin');
 
 // MW
-// const isAuth = (req, res, next) => {
-//   // если в сессии текущего пользователя есть пометка о том, что он является администратором
-//   // иначе перебросить пользователя на главную страницу сайта
-//   return req.session.isAuth ? next() : res.redirect('/login');
-// };
+const isAuth = (req, res, next) => {
+  // если в сессии текущего пользователя есть пометка о том, что он является администратором
+  // иначе перебросить пользователя на главную страницу сайта
+  return req.session.isAuth ? next() : res.status(401).redirect('/');
+};
 
-router.get(/.*$/, ctrlHome.get);
+router.get(/.*$/, isAuth, (req, res) => ctrlHome.get(req, res));
 router.post(/.*$/, ctrlHome.post);
-router.patch(/.*$/, ctrlHome.patch);
-router.delete('/api/users/:id', ctrlHome.delete);
-
-// router.get('/login', ctrlLogin.get);
-// router.get('/login(.html?)?$/', (req, res) => res.redirect('/login'));
-// router.post('/login', ctrlLogin.post);
-
-// router.get('/admin', isAuth, ctrlAdmin.get);
-// router.get('/admin(.html?)?$/', isAuth, (req, res) => res.redirect('/admin'));
-// router.post('/admin/skills', ctrlAdmin.skills);
-// router.post('/admin/upload', ctrlAdmin.product);
+router.patch('/api/users/:id/permission', ctrlHome.userUpdate);
+router.patch('/api/*/:id', ctrlHome.patch);
+router.delete('/api/*/:id', ctrlHome.delete);
 
 module.exports = router;
