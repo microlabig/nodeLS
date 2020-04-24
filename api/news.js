@@ -7,8 +7,10 @@ const getNews = async () => {
   return await NewsDB.News.find({});
 };
 
+module.exports.getNews = getNews;
+
 // упаковка данных новости
-const packNewsData = async (newsObj, userObj) => {
+module.exports.packNewsData = async (newsObj, userObj) => {
   if (validateData(newsObj) && userObj) {
     const newsList = await NewsDB.News.find({});
     const id = newsList.length;
@@ -32,7 +34,7 @@ const packNewsData = async (newsObj, userObj) => {
 };
 
 // сохранение новости
-const saveNews = async (newsObj) => {
+module.exports.saveNews = async (newsObj) => {
   try {
     const doc = await newsObj.save();
     console.log('News saved:', doc);
@@ -44,9 +46,9 @@ const saveNews = async (newsObj) => {
 };
 
 // удаление новости
-const deleteNews = async (id) => {
+module.exports.deleteNews = async (id) => {
   try {
-    const doc = await NewsDB.News.deleteOne({ id });
+    const status = await NewsDB.News.deleteOne({ id });
     if (status && status.ok === 1) {
       console.log('News deleted:', status);
       return await getNews();
@@ -60,7 +62,7 @@ const deleteNews = async (id) => {
 };
 
 // изменение текущей новости
-const updateNews = async (id, body) => {
+module.exports.updateNews = async (id, body) => {
   try {
     const news = await NewsDB.News.findOne({ id });
     news.title = body.title;
@@ -76,12 +78,4 @@ const updateNews = async (id, body) => {
     console.error(error);
     return false;
   }
-};
-
-module.exports = {
-  getNews,
-  packNewsData,
-  saveNews,
-  deleteNews,
-  updateNews
 };

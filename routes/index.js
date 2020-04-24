@@ -11,9 +11,13 @@ const isAuth = (req, res, next) => {
 };
 
 router.get(/.*$/, isAuth, (req, res) => ctrlHome.get(req, res));
+
 router.post(/.*$/, ctrlHome.post);
-router.patch('/api/users/:id/permission', ctrlHome.userUpdate);
-router.patch('/api/*/:id', ctrlHome.patch);
+
+router.patch('/api/users/:id/permission', ctrlHome.userPermissionUpdate);
+router.patch('/api/news/:id', ctrlHome.newsUpdate);
+router.patch('/api/profile', ctrlHome.profileUpdate);
+
 router.delete('/api/*/:id', ctrlHome.delete);
 
 module.exports = router;

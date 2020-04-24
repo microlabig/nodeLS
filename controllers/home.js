@@ -1,23 +1,8 @@
 // require('dotenv').config();
 // const jwt = require('jsonwebtoken');
 // const SECRET_KEY = process.env.JWT_SECRET || 'secret';
-const {
-  saveUserData,
-  packUserData,
-  checkUserData,
-  findUserById,
-  genToken,
-  getUsers,
-  updateUserPermission,
-  deleteUser
-} = require('../api/users');
-const {
-  getNews,
-  saveNews,
-  packNewsData,
-  deleteNews,
-  updateNews
-} = require('../api/news');
+const UsersAPI = require('../api/users');
+const NewsAPI = require('../api/news');
 
 const { UserDB, NewsDB } = require('../db');
 
@@ -29,6 +14,7 @@ let currentUser = null;
 module.exports.get = async (req, res) => {
   // req.session.isAuth = false;
   const url = req.url;
+  let news = null;
 
   switch (url) {
     case '/api/profile':
@@ -43,8 +29,7 @@ module.exports.get = async (req, res) => {
 
     // получений новостей
     case '/api/news':
-      const news = await getNews();
-
+      news = await NewsAPI.getNews();
       if (news) {
         res.status(200).json(news);
       } else {
@@ -53,7 +38,7 @@ module.exports.get = async (req, res) => {
       break;
 
     case '/api/users':
-      res.status(200).json(await getUsers());
+      res.status(200).json(await UsersAPI.getUsers());
       break;
 
     default:
@@ -68,20 +53,18 @@ module.exports.get = async (req, res) => {
 module.exports.post = async (req, res) => {
   const url = req.url;
   const body = req.body;
-
-  console.log('Request BODY:', req.body);
+  let userData = null;
 
   switch (url) {
     // регистрация нового пользователя
     case '/api/registration':
-      const userData = await packUserData(body);
-
+      userData = await UsersAPI.packUserData(body);
       if (userData) {
         const newUser = new UserDB.User({ ...userData });
-        const saveStatus = await saveUserData(newUser);
+        const saveStatus = await UsersAPI.saveUserData(newUser);
         if (saveStatus) {
-          const obj = await checkUserData(body);
-          res.status(201).json(genToken(obj)); // "создано"
+          const obj = await UsersAPI.checkUserData(body);
+          res.status(201).json(UsersAPI.genToken(obj)); // "создано"
         } else {
           res.status(401).json({ message: 'Пользователь уже существует' }); // "нет содержимого"
         }
@@ -92,12 +75,11 @@ module.exports.post = async (req, res) => {
 
     // логин пользователя
     case '/api/login':
-      currentUser = await checkUserData(body);
-
+      currentUser = await UsersAPI.checkUserData(body);
       if (currentUser) {
         req.session.isAuth = true;
         req.session.id = currentUser.id;
-        res.status(202).json(genToken(currentUser)); // "принято"
+        res.status(202).json(UsersAPI.genToken(currentUser)); // "принято"
       } else {
         res.status(401).json({ message: 'Ошибка ввода имени или пароля' }); // "не авторизован (не представился)"
       }
@@ -109,10 +91,10 @@ module.exports.post = async (req, res) => {
 
     // сохранение новости
     case '/api/news':
-      const newsData = await packNewsData(body, currentUser);
+      const newsData = await NewsAPI.packNewsData(body, currentUser);
       if (newsData) {
         const newNews = new NewsDB.News({ ...newsData });
-        const saveStatus = await saveNews(newNews);
+        const saveStatus = await NewsAPI.saveNews(newNews);
         if (saveStatus) {
           res.status(201).json(saveStatus); // "создано"
         } else {
@@ -133,44 +115,33 @@ module.exports.post = async (req, res) => {
 //    PATCH
 // ------------
 // изменение прав пользователя по id (permission)
-module.exports.userUpdate = async (req, res) => {
+module.exports.userPermissionUpdate = async (req, res) => {
   const id = req.params.id;
   const body = req.body;
-  const status = await updateUserPermission(id, body);
+  const status = await UsersAPI.updateUserPermission(id, body);
   if (status) {
     res.status(200).json({ message: 'Права изменены' });
   } else {
     res.status(500).json({ message: 'Ошибка изменения прав' });
   }
 };
-// изменение других данных
-module.exports.patch = async (req, res) => {
-  const what = req.url.match(/^\/api\/.{0,5}\/?/)[0];
+
+// изменение новости
+module.exports.newsUpdate = async (req, res) => {
   const id = req.params.id;
   const body = req.body;
-  let status = null;
-  console.log(body, id, what);
+  const status = await NewsAPI.updateNews(id, body);
 
-  switch (what) {
-    // обновление данных пользователя
-    case '/api/profile/':
-      status = await updateProfile(id, body);
-      break;
-
-    // изменение новости по id
-    case '/api/news/':
-      status = await updateNews(id, body);
-      break;
-
-    default:
-      res.status(404).json({ message: 'Неизвестная ошибка' });
-      break;
-  }
   if (status) {
     res.status(200).json(status);
   } else {
     res.status(500).json({ message: 'Ошибка изменения' });
   }
+};
+
+// изменение профиля текущего пользователя
+module.exports.profileUpdate = (req, res, next) => {
+  UsersAPI.updateProfile(currentUser, req, res, next);
 };
 
 // ------------
@@ -180,17 +151,16 @@ module.exports.delete = async (req, res) => {
   const what = req.url.match(/^\/api\/.{0,5}\/?/)[0];
   const id = req.params.id;
   let status = null;
-  console.log(1);
 
   switch (what) {
     // удаление пользователя по id
     case '/api/users/':
-      status = await deleteUser(id);
+      status = await UsersAPI.deleteUser(id);
       break;
 
     // удаление новости по id
     case '/api/news/':
-      status = await deleteNews(id);
+      status = await NewsAPI.deleteNews(id);
       break;
 
     default:

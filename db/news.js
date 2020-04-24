@@ -24,8 +24,4 @@ const newsScheme = new Schema({
 });
 
 // модели данных
-const News = mongoose.model('news', newsScheme);
-
-module.exports = {
-  News
-};
+module.exports.News = mongoose.model('news', newsScheme);

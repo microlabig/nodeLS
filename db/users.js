@@ -59,13 +59,13 @@ userScheme.pre('save', function (next) {
 });
 
 // закодируем пароль при обновлении данных пользователя
-userScheme.pre('update', function (next) {
-  bcrypt.hash(this.password, 10, (err, hash) => {
+userScheme.pre('updateOne', function (next) {
+  bcrypt.hash(this._update.password, 10, (err, hash) => {
     if (err) {
       console.error(err);
       return next();
     }
-    this.password = hash;
+    this._update.password = hash;
     next();
   });
 });
@@ -82,12 +82,6 @@ userScheme.methods.comparePassword = function (candidatePassword) {
 };
 
 // модели данных
-const User = mongoose.model('user', userScheme);
-const AutorizedUser = mongoose.model('autorized', autorizerUserScheme);
-const Token = mongoose.model('token', tokenScheme);
-
-module.exports = {
-  User,
-  AutorizedUser,
-  Token
-};
+module.exports.User = mongoose.model('user', userScheme);
+module.exports.AutorizedUser = mongoose.model('autorized', autorizerUserScheme);
+module.exports.Token = mongoose.model('token', tokenScheme);
