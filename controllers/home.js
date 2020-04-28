@@ -1,6 +1,3 @@
-// require('dotenv').config();
-// const jwt = require('jsonwebtoken');
-// const SECRET_KEY = process.env.JWT_SECRET || 'secret';
 const UsersAPI = require('../api/users');
 const NewsAPI = require('../api/news');
 
@@ -12,38 +9,35 @@ let currentUser = null;
 //     GET
 // ------------
 module.exports.get = async (req, res) => {
-  // req.session.isAuth = false;
   const url = req.url;
-  let news = null;
+  let status = null;
 
   switch (url) {
+    // получение профиля по JWT в authorization headers запроса
     case '/api/profile':
-      // const findUser = await findUserById(req.session.id);
-      // console.log('---', currentUser);
-      // if (req.session.id) {
-      //   res.status(200).json(currentUser); // TODO: найти пользователя
-      // } else {
-      //   res.status(401).json({ message: 'Не авторизованы' });
-      // }
+      if (req.headers.authorization) { // JWT-инфо
+        status = await UsersAPI.getUserByJWT(req.headers.authorization);
+      }
       break;
 
     // получений новостей
     case '/api/news':
-      news = await NewsAPI.getNews();
-      if (news) {
-        res.status(200).json(news);
-      } else {
-        res.status(200).json({});
-      }
+      status = await NewsAPI.getNews();
       break;
 
+    // получение списка всех пользователей
     case '/api/users':
-      res.status(200).json(await UsersAPI.getUsers());
+      status = await UsersAPI.getUsers();
       break;
 
     default:
       res.redirect('/');
       break;
+  }
+  if (status) {
+    res.status(200).json(status);
+  } else {
+    res.status(500).json({ message: 'Ошибка работы с БД' });
   }
 };
 
@@ -54,6 +48,7 @@ module.exports.post = async (req, res) => {
   const url = req.url;
   const body = req.body;
   let userData = null;
+  let newsData = null;
 
   switch (url) {
     // регистрация нового пользователя
@@ -87,11 +82,14 @@ module.exports.post = async (req, res) => {
 
     // обновление токена
     case '/api/refresh-token':
+      // TODO:
+      console.log('\nREFRESH TOKEN\n');
+      
       break;
 
     // сохранение новости
     case '/api/news':
-      const newsData = await NewsAPI.packNewsData(body, currentUser);
+      newsData = await NewsAPI.packNewsData(body, currentUser);
       if (newsData) {
         const newNews = new NewsDB.News({ ...newsData });
         const saveStatus = await NewsAPI.saveNews(newNews);

@@ -12,6 +12,7 @@ const IMG_DEFAULT_PATH = null; // './assets/img/users/default.jpg';
 
 const { validateData } = require('../helpers');
 
+// возвращает список всех пользователей из БД
 const getUsers = async () => {
   return await UserDB.User.find({});
 };
@@ -66,7 +67,7 @@ module.exports.saveUserData = async (obj) => {
 
 // генерация токена
 module.exports.genToken = (user) => {
-  const accessTokenExpiredAt = moment().utc().add({ minutes: 30 }).unix();
+  const accessTokenExpiredAt = moment().utc().add({ seconds: 2 }).unix();
   const accessToken = jwt.encode(
     {
       exp: accessTokenExpiredAt,
@@ -74,7 +75,7 @@ module.exports.genToken = (user) => {
     },
     process.env.JWT_SECRET
   );
-  const refreshTokenExpiredAt = moment().utc().add({ days: 7 }).unix();
+  const refreshTokenExpiredAt = moment().utc().add({ seconds: 3 }).unix();
   const refreshToken = jwt.encode(
     {
       exp: refreshTokenExpiredAt,
@@ -86,9 +87,9 @@ module.exports.genToken = (user) => {
   return {
     ...user._doc,
     accessToken: accessToken,
-    accessTokenExpiredAt: moment.unix(accessTokenExpiredAt).format(),
+    accessTokenExpiredAt: Date.now(moment.unix(accessTokenExpiredAt).format()),
     refreshToken: refreshToken,
-    refreshTokenExpiredAt: moment.unix(refreshTokenExpiredAt).format()
+    refreshTokenExpiredAt: Date.now(moment.unix(refreshTokenExpiredAt).format())
   };
 };
 
@@ -219,9 +220,11 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
               { id: currentUser.id },
               updatedUser
             );
-            currentUser._doc = {...updatedUser};
-            delete currentUser._doc.password;
 
+            currentUser._doc = { ...updatedUser };
+            if (currentUser._doc.hasOwnProperty('password')) {
+              delete currentUser._doc.password;
+            }
             if (status && status.ok === 1) {
               console.log('User updated:', updatedUser);
               res.status(200).json(updatedUser);
@@ -239,4 +242,26 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
       res.status(500).json({ message: 'Неверно заполнены данные' });
     }
   });
+};
+
+// возвращает пользователя по JWT-инфо
+module.exports.getUserByJWT = async (token) => {
+  try {
+    const decodedData = jwt.decode(token, process.env.JWT_SECRET);
+    const { username } = decodedData;
+    const findUser = await UserDB.User.findOne({ username });
+
+    if (findUser) {
+      if (findUser._doc.hasOwnProperty('password')) {
+        delete findUser._doc.password;
+      }
+      console.log('Get Profile Data:', findUser);
+      return findUser;
+    } else {
+      throw new Error('Ошибка удаления из БД');
+    }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
