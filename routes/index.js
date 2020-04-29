@@ -10,6 +10,11 @@ const isAuth = (req, res, next) => {
   return req.session.isAuth ? next() : res.status(401).redirect('/');
 };
 
+router.all('*', (req, res, next) => {
+  console.log(`\n--- ${req.url} ---\n`.toUpperCase());
+  next();
+});
+
 router.get(/.*$/, isAuth, (req, res) => ctrlHome.get(req, res));
 
 router.post(/.*$/, ctrlHome.post);

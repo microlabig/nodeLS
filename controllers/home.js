@@ -82,9 +82,14 @@ module.exports.post = async (req, res) => {
 
     // обновление токена
     case '/api/refresh-token':
-      // TODO:
-      console.log('\nREFRESH TOKEN\n');
-      
+      if (req.headers.authorization) { // JWT-инфо
+        const findUser = await UsersAPI.getUserByJWT(req.headers.authorization);
+        if (findUser) {
+          res.status(201).json(UsersAPI.genToken(findUser));
+        } else {
+          res.status(500).json({ message: 'Пользователь в БД не найден'});
+        }
+      }
       break;
 
     // сохранение новости

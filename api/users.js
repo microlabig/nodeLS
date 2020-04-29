@@ -65,9 +65,9 @@ module.exports.saveUserData = async (obj) => {
   }
 };
 
-// генерация токена
+// генерация токенов
 module.exports.genToken = (user) => {
-  const accessTokenExpiredAt = moment().utc().add({ seconds: 2 }).unix();
+  const accessTokenExpiredAt = moment().utc().add({ asMinutes: 30 }).unix();
   const accessToken = jwt.encode(
     {
       exp: accessTokenExpiredAt,
@@ -75,7 +75,7 @@ module.exports.genToken = (user) => {
     },
     process.env.JWT_SECRET
   );
-  const refreshTokenExpiredAt = moment().utc().add({ seconds: 3 }).unix();
+  const refreshTokenExpiredAt = moment().utc().add({ days: 30 }).unix();
   const refreshToken = jwt.encode(
     {
       exp: refreshTokenExpiredAt,
@@ -87,11 +87,34 @@ module.exports.genToken = (user) => {
   return {
     ...user._doc,
     accessToken: accessToken,
-    accessTokenExpiredAt: Date.now(moment.unix(accessTokenExpiredAt).format()),
+    accessTokenExpiredAt: Date.parse(moment.unix(accessTokenExpiredAt).format()),
     refreshToken: refreshToken,
-    refreshTokenExpiredAt: Date.now(moment.unix(refreshTokenExpiredAt).format())
+    refreshTokenExpiredAt: Date.parse(moment.unix(refreshTokenExpiredAt).format())
   };
 };
+
+// возвращает пользователя по JWT-инфо
+module.exports.getUserByJWT = async (token) => {
+  try {
+    const decodedData = jwt.decode(token, process.env.JWT_SECRET);
+    const { username } = decodedData;
+    const findUser = await UserDB.User.findOne({ username });
+
+    if (findUser) {
+      if (findUser._doc.hasOwnProperty('password')) {
+        delete findUser._doc.password;
+      }
+      console.log('Get Profile Data:', findUser);
+      return findUser;
+    } else {
+      throw new Error('Ошибка удаления из БД');
+    }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 
 // проверка данных пользователя
 module.exports.checkUserData = async (user) => {
@@ -179,6 +202,10 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
   // сформируем полный путь до папки загрузки
   form.uploadDir = path.join(process.cwd(), upload);
 
+  if (!fs.existsSync(form.uploadDir)) {
+    fs.mkdirSync(form.uploadDir);
+  }
+
   // распарсим входные данные
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -193,8 +220,7 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
       const fileName = path.join(upload, files.avatar.name);
 
       // переименуем файл со случайно сгенерированным именем в имя, которое клиент отправил
-      fs.rename(
-        files.avatar.path,
+      fs.rename(files.avatar.path,
         path.join(process.cwd(), fileName),
         async (err) => {
           if (err) {
@@ -242,26 +268,4 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
       res.status(500).json({ message: 'Неверно заполнены данные' });
     }
   });
-};
-
-// возвращает пользователя по JWT-инфо
-module.exports.getUserByJWT = async (token) => {
-  try {
-    const decodedData = jwt.decode(token, process.env.JWT_SECRET);
-    const { username } = decodedData;
-    const findUser = await UserDB.User.findOne({ username });
-
-    if (findUser) {
-      if (findUser._doc.hasOwnProperty('password')) {
-        delete findUser._doc.password;
-      }
-      console.log('Get Profile Data:', findUser);
-      return findUser;
-    } else {
-      throw new Error('Ошибка удаления из БД');
-    }
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
 };
