@@ -67,7 +67,7 @@ module.exports.saveUserData = async (obj) => {
 
 // генерация токенов
 module.exports.genToken = (user) => {
-  const accessTokenExpiredAt = moment().utc().add({ asMinutes: 30 }).unix();
+  const accessTokenExpiredAt = moment().utc().add({ minutes: 30 }).unix();
   const accessToken = jwt.encode(
     {
       exp: accessTokenExpiredAt,

@@ -12,8 +12,8 @@ module.exports.getNews = getNews;
 // упаковка данных новости
 module.exports.packNewsData = async (newsObj, userObj) => {
   if (validateData(newsObj) && userObj) {
-    const newsList = await NewsDB.News.find({});
-    const id = newsList.length;
+    // const newsList = await NewsDB.News.find({});
+    const id = await NewsDB.News.ensureIndex({ id: 1 }, { unique: true }); // newsList.length;
 
     return {
       id,

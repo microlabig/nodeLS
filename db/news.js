@@ -13,7 +13,7 @@ const newsScheme = new Schema({
   created_at: Date,
   text: String,
   title: String,
-  user: {
+  user: { // https://qna.habr.com/q/586673 или https://mongoosejs.com/docs/populate.html
     firstName: String,
     id: Number,
     image: String,

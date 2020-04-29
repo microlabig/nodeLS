@@ -29,22 +29,22 @@ const userScheme = new Schema({
   }
 });
 
-// объект авторизированного пользователя
-const autorizerUserScheme = new Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  accessToken: String,
-  refreshToken: String,
-  accessTokenExpiredAt: Date,
-  refreshTokenExpiredAt: Date
-});
+// // объект авторизированного пользователя
+// const autorizerUserScheme = new Schema({
+//   _id: mongoose.Schema.Types.ObjectId,
+//   accessToken: String,
+//   refreshToken: String,
+//   accessTokenExpiredAt: Date,
+//   refreshTokenExpiredAt: Date
+// });
 
-// объект с токенами
-const tokenScheme = new Schema({
-  accessToken: String,
-  refreshToken: String,
-  accessTokenExpiredAt: Date,
-  refreshTokenExpiredAt: Date
-});
+// // объект с токенами
+// const tokenScheme = new Schema({
+//   accessToken: String,
+//   refreshToken: String,
+//   accessTokenExpiredAt: Date,
+//   refreshTokenExpiredAt: Date
+// });
 
 // закодируем пароль при сохранении пользователя
 userScheme.pre('save', function (next) {
@@ -83,5 +83,5 @@ userScheme.methods.comparePassword = function (candidatePassword) {
 
 // модели данных
 module.exports.User = mongoose.model('user', userScheme);
-module.exports.AutorizedUser = mongoose.model('autorized', autorizerUserScheme);
-module.exports.Token = mongoose.model('token', tokenScheme);
+// module.exports.AutorizedUser = mongoose.model('autorized', autorizerUserScheme);
+// module.exports.Token = mongoose.model('token', tokenScheme);
