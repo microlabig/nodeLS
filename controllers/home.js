@@ -3,8 +3,6 @@ const NewsAPI = require('../api/news');
 
 const { UserDB, NewsDB } = require('../db');
 
-let currentUser = null;
-
 // ------------
 //     GET
 // ------------
@@ -15,7 +13,8 @@ module.exports.get = async (req, res) => {
   switch (url) {
     // получение профиля по JWT в authorization headers запроса
     case '/api/profile':
-      if (req.headers.authorization) { // JWT-инфо
+      if (req.headers.authorization) {
+        // JWT-инфо
         status = await UsersAPI.getUserByJWT(req.headers.authorization);
       }
       break;
@@ -49,6 +48,7 @@ module.exports.post = async (req, res) => {
   const body = req.body;
   let userData = null;
   let newsData = null;
+  let checkedUser = null;
 
   switch (url) {
     // регистрация нового пользователя
@@ -70,11 +70,11 @@ module.exports.post = async (req, res) => {
 
     // логин пользователя
     case '/api/login':
-      currentUser = await UsersAPI.checkUserData(body);
-      if (currentUser) {
+      checkedUser = await UsersAPI.checkUserData(body);
+      if (checkedUser) {
         req.session.isAuth = true;
-        req.session.id = currentUser.id;
-        res.status(202).json(UsersAPI.genToken(currentUser)); // "принято"
+        req.session.id = checkedUser.id;
+        res.status(202).json(UsersAPI.genToken(checkedUser)); // "принято"
       } else {
         res.status(401).json({ message: 'Ошибка ввода имени или пароля' }); // "не авторизован (не представился)"
       }
@@ -82,26 +82,35 @@ module.exports.post = async (req, res) => {
 
     // обновление токена
     case '/api/refresh-token':
-      if (req.headers.authorization) { // JWT-инфо
+      if (req.headers.authorization) {
+        // JWT-инфо
         const findUser = await UsersAPI.getUserByJWT(req.headers.authorization);
         if (findUser) {
           res.status(201).json(UsersAPI.genToken(findUser));
         } else {
-          res.status(500).json({ message: 'Пользователь в БД не найден'});
+          res.status(500).json({ message: 'Пользователь в БД не найден' });
         }
       }
       break;
 
     // сохранение новости
     case '/api/news':
-      newsData = await NewsAPI.packNewsData(body, currentUser);
-      if (newsData) {
-        const newNews = new NewsDB.News({ ...newsData });
-        const saveStatus = await NewsAPI.saveNews(newNews);
-        if (saveStatus) {
-          res.status(201).json(saveStatus); // "создано"
-        } else {
-          res.status(204).json({ message: 'Ошибка сохранения' }); // "нет содержимого"
+      if (req.headers.authorization) {
+        // JWT-инфо
+        const findedUser = await UsersAPI.getUserByJWT(
+          req.headers.authorization
+        );
+        if (findedUser) {
+          newsData = await NewsAPI.packNewsData(body, findedUser);
+          if (newsData) {
+            const newNews = new NewsDB.News({ ...newsData });
+            const saveStatus = await NewsAPI.saveNews(newNews);
+            if (saveStatus) {
+              res.status(201).json(saveStatus); // "создано"
+            } else {
+              res.status(204).json({ message: 'Ошибка сохранения' }); // "нет содержимого"
+            }
+          }
         }
       } else {
         res.status(204).json({ message: 'Введите все поля' });
@@ -143,8 +152,18 @@ module.exports.newsUpdate = async (req, res) => {
 };
 
 // изменение профиля текущего пользователя
-module.exports.profileUpdate = (req, res, next) => {
-  UsersAPI.updateProfile(currentUser, req, res, next);
+module.exports.profileUpdate = async (req, res, next) => {
+  let currentUser = null;
+
+  if (req.headers.authorization) {
+    // JWT-инфо
+    currentUser = await UsersAPI.getUserByJWT(req.headers.authorization);
+    if (currentUser) {
+      UsersAPI.updateProfile(currentUser, req, res, next);
+    } else {
+      res.status(500).json({ message: 'Пользователь не найден в БД' });
+    }
+  }
 };
 
 // ------------

@@ -13,14 +13,7 @@ const newsScheme = new Schema({
   created_at: Date,
   text: String,
   title: String,
-  user: { // https://qna.habr.com/q/586673 или https://mongoosejs.com/docs/populate.html
-    firstName: String,
-    id: Number,
-    image: String,
-    middleName: String,
-    surName: String,
-    username: String
-  }
+  user: { type: Schema.Types.ObjectId, ref: 'user' } // https://mongoosejs.com/docs/populate.html
 });
 
 // модели данных

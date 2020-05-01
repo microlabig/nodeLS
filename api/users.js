@@ -22,8 +22,16 @@ module.exports.getUsers = getUsers;
 // упаковка данных пользователя
 module.exports.packUserData = async (userObj, options = {}) => {
   if (validateData(userObj)) {
-    const userList = await UserDB.User.find({});
-    const id = userList.length;
+    const usersCount = await UserDB.User.countDocuments({}); // количество документов в users
+    let id = 0;
+
+    // если есть документы
+    if (usersCount) {
+      // найдем последний добавленный документ
+      const usersLast = await UserDB.User.find().sort({ _id: -1 }).limit(1);
+      // увеличим id на 1
+      id = usersLast[0].id + 1;
+    }
 
     return {
       id,
@@ -35,10 +43,10 @@ module.exports.packUserData = async (userObj, options = {}) => {
         news: { C: true, R: true, U: true, D: true },
         settings: { C: true, R: true, U: true, D: true }
       },
-      createdAt: new Date(Date.now()).toUTCString(),
       surName: userObj.surName,
       username: userObj.username,
-      password: userObj.password
+      password: userObj.password,
+      createdAt: new Date(Date.now()).toUTCString()
     };
   }
   return null;
@@ -181,7 +189,9 @@ module.exports.deleteUser = async (id) => {
     const findUser = await UserDB.User.findOne({ id });
     const status = await UserDB.User.deleteOne({ id });
     if (status && status.ok === 1) {
-      await unlink(path.join(process.cwd(), 'public', findUser.image));
+      if (findUser.image) { // удалим аватар удаляемого пользователя
+        await unlink(path.join(process.cwd(), 'public', findUser.image));
+      }
       console.log('News deleted:', status);
       return await getUsers();
     } else {
@@ -202,8 +212,17 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
   // сформируем полный путь до папки загрузки
   form.uploadDir = path.join(process.cwd(), upload);
 
+  // если папки загрузки аватарок не существует
   if (!fs.existsSync(form.uploadDir)) {
     fs.mkdirSync(form.uploadDir);
+  } else {
+    // удалим старый аватар при его наличии
+    if (currentUser.image) {
+      const oldAvatar = path.join(process.cwd(), '/public', currentUser.image);
+      if (fs.existsSync(oldAvatar)) {
+        fs.unlinkSync(oldAvatar);
+      }
+    }
   }
 
   // распарсим входные данные

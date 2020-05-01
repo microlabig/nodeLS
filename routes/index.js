@@ -10,8 +10,8 @@ const isAuth = (req, res, next) => {
   return req.session.isAuth ? next() : res.status(401).redirect('/');
 };
 
-router.all('*', (req, res, next) => {
-  console.log(`\n--- ${req.url} ---\n`.toUpperCase());
+router.all('*', (req, res, next) => { // для дебага в консоли
+  console.log(`\n--- ${req.method} : ${req.url} ---\n`.toUpperCase());
   next();
 });
 

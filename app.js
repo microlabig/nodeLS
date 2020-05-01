@@ -1,8 +1,6 @@
-require('dotenv').config();
+require('dotenv').config(); // считываем необходимые переменные окружения
 const path = require('path');
 const bodyParser = require('body-parser');
-// const flash = require('connect-flash');
-// const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const express = require('express');
 const app = express();
@@ -28,36 +26,11 @@ app.use(
     saveUninitialized: false // предотвращает перегрузку приложения слишком большим количеством пустых сеансов (=true)
   })
 );
-// app.use(flash());
 
 // статика
 app.use(express.static(path.join(__dirname, 'public')));
 
-// PUG
-// app.set('views', './views/pages');
-// app.set('view engine', 'pug');
-
-// роутер
-app.use('/', (req, res, next) => {
-  console.log(`Request: ${req.method}, ${req.url}`);
-  next();
-});
 app.use('/', require('./routes/index'));
-
-// обработка ошибки 404
-// app.use((req, res, next) => {
-//   const err = new Error('Страница не найдена!');
-//   err.status = 404;
-//   next(err);
-// });
-
-// // обработчик ошибок
-// app.use((err, req, res, next) => {
-//   console.error(err, '\n');
-//   err.status = err.status || 500;
-//   res.status(err.status);
-//   res.render('error', { message: err.message, status: err.status, error: err });
-// });
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
