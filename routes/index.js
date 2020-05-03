@@ -11,7 +11,7 @@ const isAuth = (req, res, next) => {
 };
 
 router.all('*', (req, res, next) => { // для дебага в консоли
-  console.log(`\n--- ${req.method} : ${req.url} ---\n`.toUpperCase());
+  console.log(`\n--- ${req.method} : ${req.url} ---`.toUpperCase());
   next();
 });
 

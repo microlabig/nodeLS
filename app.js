@@ -1,12 +1,12 @@
 require('dotenv').config(); // считываем необходимые переменные окружения
+const PORT = process.env.PORT || 3000; // порт сервера
+
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const express = require('express');
 const app = express();
-
-// порт сервера
-const PORT = process.env.PORT;
+const socketRun = require('./chat');
 
 // парсинг post запросов от клиента
 app.use(bodyParser.urlencoded({ extended: false })); // ключ: значение
@@ -30,8 +30,13 @@ app.use(
 // статика
 app.use(express.static(path.join(__dirname, 'public')));
 
+// роутер
 app.use('/', require('./routes/index'));
 
+// сокет на socket.io (чат)
+socketRun();
+
+// основной сервер
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
