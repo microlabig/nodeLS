@@ -1,60 +1,75 @@
 const SOCKET_PORT = (parseInt(process.env.PORT) + 30).toString(); // порт сокет соединения = (default + 30)
-const io = require('socket.io').listen(SOCKET_PORT);
+const io = require('socket.io').listen(SOCKET_PORT); // сокет-сервер
 
-const users = {};
-const messages = {};
+const users = {}; // список пользователей
+const history = {}; // список сообщений
+
+// возвращает socketId по id (напр., socketId: 'z5tnze0eDHfBjoMHAAAD', а userId: 0)
+const getSocketId = (userId) => {
+  for (const user in users) {
+    if (users.hasOwnProperty(user)) {
+      if (users[user].userId === userId) {
+        return users[user].socketId;
+      }
+    }
+  }
+};
 
 module.exports = () => {
   console.log(`Socket-сервер запущен на порту ${SOCKET_PORT}`);
 
+  // обработчик соединения нового клиента с сокет-сервером
   io.sockets.on('connection', (socket) => {
     const socketId = socket.id;
 
     socket.on('users:connect', ({ userId, username }) => {
-      console.log(`${username} c id:${userId} подключился в чат`);
+      console.log(`username:${username} c id:${userId} подключился в чат`);
       users[socketId] = {
-        username, // : `#${username}`,
-        socketId, // : `#${socketId}`,
-        userId, // : `#${userID}`,
+        username,
+        socketId,
+        userId,
         activeRoom: null
       };
       socket.emit('users:list', Object.values(users));
       socket.broadcast.emit('users:add', users[socketId]);
-      messages[userId] = [];
     });
 
+    // обработчик нового сообщения от пользователя
     socket.on('message:add', ({ senderId, recipientId, roomId, text }) => {
       console.log('\nmessage:add', { senderId, recipientId, roomId, text });
-      messages[senderId].push({ recipientId, text });
+      if (!history[roomId]) {
+        history[roomId] = [];
+      }
       if (users[roomId]) {
-        socket.in(roomId).emit('message:add', {
-          recipientId,
-          senderId,
-          text
+        Object.values(users).forEach((user) => {
+          if (user.activeRoom && user.activeRoom === roomId) {
+            io.to(user.socketId).emit('message:add', {
+              senderId, // отправитель
+              recipientId, // получатель
+              text
+            });
+          }
         });
+        history[roomId].push({ senderId, text });
       }
     });
 
+    // обработчик отправляющий историю сообщений выбранному пользователю
     socket.on('message:history', ({ recipientId, userId }) => {
-      const messagesList = [];
-      console.log('\nmessage:history', { recipientId, userId });
-
-      for (const obj in messages) {
-        messagesList.push(messages[obj].text);
-      }
-
-      if (users[socketId]) {
-        console.log('Список сообщений: ', messagesList);
-
-        socket.in(socketId).emit('message:history', messagesList);
+      const currUserSocketId = getSocketId(recipientId);
+      users[socketId].activeRoom = getSocketId(recipientId);
+      if (currUserSocketId && history[currUserSocketId]) {
+        console.log('Список сообщений: ', history[currUserSocketId]);
+        socket.emit('message:history', history[currUserSocketId]);
       }
     });
 
+    // обработчик отключения текущего пользователя (по socketId)
     socket.on('disconnect', () => {
       if (users[socketId]) {
         socket.broadcast.emit('users:leave', socketId);
         delete users[socketId];
-        delete messages[socketId];
+        delete history[socketId];
       }
     });
   });

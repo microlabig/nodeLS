@@ -36,10 +36,6 @@ module.exports.get = async (req, res) => {
   if (status) {
     res.status(200).json(status);
   }
-  // else {
-  //   res.redirect('/');
-  //   // res.status(500).json({ message: 'Ошибка работы с БД' });
-  // }
 };
 
 // ------------
