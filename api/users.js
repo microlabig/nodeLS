@@ -1,6 +1,7 @@
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
+const Jimp = require('jimp'); // для сжатия аватарок и их обрезка до квадратных пропорций
 const util = require('util');
 const unlink = util.promisify(fs.unlink); // делаем из ф-ии колбека ф-ию промис
 
@@ -95,9 +96,13 @@ module.exports.genToken = (user) => {
   return {
     ...user._doc,
     accessToken: accessToken,
-    accessTokenExpiredAt: Date.parse(moment.unix(accessTokenExpiredAt).format()),
+    accessTokenExpiredAt: Date.parse(
+      moment.unix(accessTokenExpiredAt).format()
+    ),
     refreshToken: refreshToken,
-    refreshTokenExpiredAt: Date.parse(moment.unix(refreshTokenExpiredAt).format())
+    refreshTokenExpiredAt: Date.parse(
+      moment.unix(refreshTokenExpiredAt).format()
+    )
   };
 };
 
@@ -122,7 +127,6 @@ module.exports.getUserByJWT = async (token) => {
     return false;
   }
 };
-
 
 // проверка данных пользователя
 module.exports.checkUserData = async (user) => {
@@ -189,7 +193,8 @@ module.exports.deleteUser = async (id) => {
     const findUser = await UserDB.User.findOne({ id });
     const status = await UserDB.User.deleteOne({ id });
     if (status && status.ok === 1) {
-      if (findUser.image) { // удалим аватар удаляемого пользователя
+      if (findUser.image) {
+        // удалим аватар удаляемого пользователя
         await unlink(path.join(process.cwd(), 'public', findUser.image));
       }
       console.log('News deleted:', status);
@@ -237,52 +242,57 @@ module.exports.updateProfile = (currentUser, req, res, next) => {
     if (isValid) {
       // путь, относительно корневой директории
       const fileName = path.join(upload, files.avatar.name);
-
+      const newName = path.join(process.cwd(), fileName);
       // переименуем файл со случайно сгенерированным именем в имя, которое клиент отправил
-      fs.rename(files.avatar.path,
-        path.join(process.cwd(), fileName),
-        async (err) => {
-          if (err) {
-            console.error(err.message);
-            return false;
-          }
-          // взять оставшуюся часть пути, начиная с assets
-          const pathToImage = fileName.substr(fileName.indexOf('assets'));
-          const password = fields.newPassword
-            ? fields.newPassword
-            : fields.oldPassword;
-
-          try {
-            const updatedUser = {
-              ...currentUser._doc,
-              image: pathToImage,
-              firstName: fields.firstName,
-              surName: fields.surName,
-              middleName: fields.middleName,
-              password
-            };
-            const status = await UserDB.User.updateOne(
-              { id: currentUser.id },
-              updatedUser
-            );
-
-            currentUser._doc = { ...updatedUser };
-            if (currentUser._doc.hasOwnProperty('password')) {
-              delete currentUser._doc.password;
-            }
-            if (status && status.ok === 1) {
-              console.log('User updated:', updatedUser);
-              res.status(200).json(updatedUser);
-              return true;
-            } else {
-              throw new Error('Ошибка изменения данных в БД');
-            }
-          } catch (error) {
-            console.error(error);
-            return false;
-          }
+      fs.rename(files.avatar.path, newName, async (err) => {
+        if (err) {
+          console.error(err.message);
+          return false;
         }
-      );
+
+        // взять оставшуюся часть пути, начиная с assets
+        const pathToImage = fileName.substr(fileName.indexOf('assets'));
+        const password = fields.newPassword
+          ? fields.newPassword
+          : fields.oldPassword;
+
+        // обновление БД
+        try {
+          const jimpedFile = await Jimp.read(newName);
+          jimpedFile
+            .cover(384, 384) // resize
+            .crop(0, 0, 384, 384) // cropping
+            .quality(60) // set PNG or JPEG quality
+            .write(newName); // save
+          const updatedUser = {
+            ...currentUser._doc,
+            image: pathToImage,
+            firstName: fields.firstName,
+            surName: fields.surName,
+            middleName: fields.middleName,
+            password
+          };
+          const status = await UserDB.User.updateOne(
+            { id: currentUser.id },
+            updatedUser
+          );
+
+          currentUser._doc = { ...updatedUser };
+          if (currentUser._doc.hasOwnProperty('password')) {
+            delete currentUser._doc.password;
+          }
+          if (status && status.ok === 1) {
+            console.log('User updated:', updatedUser);
+            res.status(200).json(updatedUser);
+            return true;
+          } else {
+            throw new Error('Ошибка изменения данных в БД');
+          }
+        } catch (error) {
+          console.error(error);
+          return false;
+        }
+      });
     } else {
       res.status(500).json({ message: 'Неверно заполнены данные' });
     }
