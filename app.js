@@ -12,7 +12,6 @@ const socketRun = require('./chat');
 app.use(bodyParser.urlencoded({ extended: false })); // ключ: значение
 app.use(bodyParser.json());
 
-// app.use(cookieParser());
 app.use(
   session({
     secret: 'common:session',
