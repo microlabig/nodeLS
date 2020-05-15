@@ -1,22 +1,37 @@
 # ДЗ 5 (Express.js + Mongoose + socket.io)
 Дата прохождения курса 10.03.2020 - 17.04.2020
 
+Проект упакован в Docker-image для Production
+
 **Студент:** Безместин Игорь
 
 **Наставник:** Артем Пузаков
 
 ## Необходимые действия для запуска проекта
 
-1. установить node.js [nodejs.org](https://nodejs.org/ "Node.JS")
-2. установить [MongoDBCompassCommunity](https://www.mongodb.com/download-center/compass "MongoDB Compass")
-3. запустить сервер mongod
+1. установить node.js - [nodejs.org](https://nodejs.org/ "Node.JS")
+2. установить mongodb - [MongoDBCompassCommunity](https://www.mongodb.com/download-center/compass "MongoDB Compass")
 4. cклонировать проект к себе и перейти в каталог проекта
-5. `npm i` - установить зависимости
-6. запуск проекта командой `node app`
+5. `npm i` или `yarn install` - установить зависимости
+6. создать в корне проекта файл `.env`, настроить следующим образом:  
+   ```dotnetcli
+    PORT=3000               # порт приложения
+    mode=production         # режим работы приложения ("development" работает с локальной БД)
+    secretKey=secret        # секретный ключ для сессий
+
+    JWT_SECRET='jwt_secret' # секретный ключ для работы с JWT-токенами
+
+    DB_HOST='127.0.0.1'     # сервер локальной БД
+    DB_PORT='27017'         # порт локальной БД
+
+    REMOTE_DB_NAME='nameDB' # имя удаленной БД
+    REMOTE_DB_USER='user'   # логин доступа к удаленной БД
+    REMOTE_DB_PASS='pass'   # пароль к удаленной БД
+   ```
+7. запуск проекта командой `node app`
 
 ---
-
-В папке ./build находится подготовленная frontend-часть проекта, ваша задача - реализовать backend.
+## ТЗ:
 
 1. Выберите фреймворк - Express.js или Koa.js.
 2. Выберите базу данных - MongoDB (рекомедуемая ORM - Mongoose) или PostgreSQL (рекомедуемая ORM - Sequelize).

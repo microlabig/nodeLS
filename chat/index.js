@@ -36,7 +36,6 @@ module.exports = () => {
 
     // обработчик нового сообщения от пользователя
     socket.on('message:add', ({ senderId, recipientId, roomId, text }) => {
-      console.log('\nmessage:add', { senderId, recipientId, roomId, text });
       if (!history[roomId]) {
         history[roomId] = [];
       }
@@ -59,7 +58,6 @@ module.exports = () => {
       const currUserSocketId = getSocketId(recipientId);
       users[socketId].activeRoom = getSocketId(recipientId);
       if (currUserSocketId && history[currUserSocketId]) {
-        console.log('Список сообщений: ', history[currUserSocketId]);
         socket.emit('message:history', history[currUserSocketId]);
       }
     });
