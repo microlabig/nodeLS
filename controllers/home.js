@@ -71,7 +71,7 @@ module.exports.post = async (req, res) => {
       checkedUser = await UsersAPI.checkUserData(body);
       if (checkedUser) {
         req.session.isAuth = true;
-        req.session.id = checkedUser.id;
+        req.session.uid = checkedUser.id;
         res.status(202).json(UsersAPI.genToken(checkedUser)); // "принято"
       } else {
         res.status(401).json({ message: 'Ошибка ввода имени или пароля' }); // "не авторизован (не представился)"
