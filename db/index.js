@@ -13,8 +13,8 @@ const NewsDB = require('./news');
 // соединяемся с БД
 mongoose
   .connect(dbPath, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    useNewUrlParser: true
+    // useUnifiedTopology: true
   })
   .then(() => {
     console.log('Connected to DB');
