@@ -35,8 +35,8 @@ app.use(cors());
 app.use('/', require('./routes'));
 
 // сокет на socket.io (чат)
-const io = require('socket.io').listen(app); // сокет-сервер
-socketRun(io);
+// const io = require('socket.io').listen(app); // сокет-сервер
+socketRun();
 
 // основной сервер
 app.listen(PORT, () => {
