@@ -15,6 +15,7 @@ const io = require('socket.io')(server);
 app.use(bodyParser.urlencoded({ extended: false })); // ключ: значение
 app.use(bodyParser.json());
 
+// session cookie
 app.use(
   session({
     secret: 'common:session',
@@ -41,10 +42,10 @@ app.use((req, res, next) => {
 app.use('/', require('./routes'));
 
 // основной сервер
-server.listen(PORT, () => {
-  console.log('CORS-enabled web server');
+server.listen(PORT, () => {  
   console.log(`Сервер запущен на порту ${PORT}`);
 });
+
 // чат на socket.io
 socketRun(io);
 
