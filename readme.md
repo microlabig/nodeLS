@@ -1,7 +1,7 @@
-# ДЗ 5 (Express.js + Mongoose + socket.io)
+# ДЗ 5 (Express.js + Mongoose + socket.io + Docker)
 Дата прохождения курса 10.03.2020 - 17.04.2020
 
-Проект упакован в Docker-image для Production
+Итоговый проект находится на heroku [https://microlabig.herokuapp.com](https://microlabig.herokuapp.com "https://microlabig.herokuapp.com")
 
 **Студент:** Безместин Игорь
 
@@ -11,9 +11,9 @@
 
 1. установить node.js - [nodejs.org](https://nodejs.org/ "Node.JS")
 2. установить mongodb - [MongoDBCompassCommunity](https://www.mongodb.com/download-center/compass "MongoDB Compass")
-4. cклонировать проект к себе и перейти в каталог проекта
-5. `npm i` или `yarn install` - установить зависимости
-6. создать в корне проекта файл `.env`, настроить следующим образом:  
+3. cклонировать проект к себе и перейти в каталог проекта
+4. `npm i` или `yarn install` - установить зависимости
+5. создать в корне проекта файл `.env`, настроить следующим образом:  
    
    ```dotnetcli
     PORT=3000               # порт приложения
@@ -29,7 +29,8 @@
     REMOTE_DB_USER='user'   # логин доступа к удаленной БД
     REMOTE_DB_PASS='pass'   # пароль к удаленной БД
    ```
-7. запуск проекта командой `node app`
+
+6. запуск проекта командой `node app`
 
 ---
 ## ТЗ:
@@ -101,7 +102,6 @@
             }
             surName: String,
             username: String,
-
             accessToken: String,
                 refreshToken: String,
                 accessTokenExpiredAt: Date (ms),
