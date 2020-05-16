@@ -83,7 +83,7 @@
                 chat: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
                 news: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
                 settings: { C: Boolean, R: Boolean, U: Boolean, D: Boolean }
-            }
+            },
             surName: String,
             username: String
         }
@@ -99,7 +99,7 @@
                 chat: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
                 news: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
                 settings: { C: Boolean, R: Boolean, U: Boolean, D: Boolean }
-            }
+            },
             surName: String,
             username: String,
             accessToken: String,
