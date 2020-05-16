@@ -35,13 +35,13 @@ app.use(cors());
 app.use('/', require('./routes'));
 
 // сокет на socket.io (чат)
-// const io = require('socket.io').listen(app); // сокет-сервер
-socketRun();
+// socketRun();
 
 // основной сервер
 app.listen(PORT, () => {
   console.log('CORS-enabled web server');
   console.log(`Сервер запущен на порту ${PORT}`);
+  socketRun(app);
 });
 
 app.use((err, req, res, next) => {
