@@ -43,3 +43,12 @@ app.listen(PORT, () => {
   console.log('CORS-enabled web server');
   console.log(`Сервер запущен на порту ${PORT}`);
 });
+
+app.use((err, req, res, next) => {
+  if (err) {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  } else {
+    next();
+  }
+});

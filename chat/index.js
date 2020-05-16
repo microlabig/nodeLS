@@ -1,5 +1,5 @@
 const SOCKET_PORT = (parseInt(process.env.PORT) + 30).toString(); // порт сокет соединения = (default + 30)
-const io = require('socket.io').listen(SOCKET_PORT); // сокет-сервер
+const io = require('socket.io').listen(process.env.PORT); // сокет-сервер
 
 const users = {}; // список пользователей
 const history = {}; // список сообщений
