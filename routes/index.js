@@ -10,7 +10,11 @@ const isAuth = (req, res, next) => {
   return req.session.isAuth ? next() : res.status(401).redirect('/');
 };
 
-router.all('*', (req, res, next) => { // для дебага в консоли
+router.all('*', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  // для дебага в консоли
   console.log(`\n--- ${req.method} : ${req.url} ---`.toUpperCase());
   next();
 });
@@ -25,8 +29,8 @@ router.patch('/api/profile', ctrlHome.profileUpdate);
 
 router.delete('/api/*/:id', ctrlHome.delete);
 
-router.options('*', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-});
+// router.options('*', (req, res) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+// });
 
 module.exports = router;
