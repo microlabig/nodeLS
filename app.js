@@ -1,5 +1,5 @@
 require('dotenv').config(); // считываем необходимые переменные окружения
-const APP_PORT = process.env.APP_PORT || 3000; // порт сервера
+const PORT = process.env.PORT || 3000; // порт сервера
 
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -36,6 +36,6 @@ app.use('/', require('./routes'));
 socketRun();
 
 // основной сервер
-app.listen(APP_PORT, () => {
-  console.log(`Сервер запущен на порту ${APP_PORT}`);
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
