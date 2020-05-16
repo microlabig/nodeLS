@@ -25,8 +25,6 @@ router.patch('/api/profile', ctrlHome.profileUpdate);
 
 router.delete('/api/*/:id', ctrlHome.delete);
 
-router.options('*', (req, res) => {
-  console.log(req);
-})
+router.options('*', ctrlHome.post);
 
 module.exports = router;
