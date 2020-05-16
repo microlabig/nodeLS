@@ -7,7 +7,7 @@ const session = require('express-session');
 const cors = require('cors');
 const express = require('express');
 const app = express();
-const serverAndSocketRun = require('./chat');
+const socketRun = require('./chat');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
@@ -46,7 +46,7 @@ server.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
 // чат на socket.io
-serverAndSocketRun(io);
+socketRun(io);
 
 // error handler
 app.use((err, req, res, next) => {

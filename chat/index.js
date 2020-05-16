@@ -12,7 +12,6 @@ const getSocketId = (userId) => {
   }
 };
 
-// сокет на socket.io (чат)
 module.exports = (io) => {
   // обработчик соединения нового клиента с сокет-сервером
   io.sockets.on('connection', (socket) => {
