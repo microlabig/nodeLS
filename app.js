@@ -41,7 +41,7 @@ app.use('/', require('./routes'));
 app.listen(PORT, () => {
   console.log('CORS-enabled web server');
   console.log(`Сервер запущен на порту ${PORT}`);
-  socketRun();
+  socketRun(app);
 });
 
 app.use((err, req, res, next) => {
