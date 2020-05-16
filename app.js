@@ -34,15 +34,12 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public')));
 
 // роутер
-app.use((req, res, next) => {
-  console.log('CORS-enabled web server');
-  cors();
-  next();
-});
+app.use(cors());
 app.use('/', require('./routes'));
 
 // основной сервер
-server.listen(PORT, () => {  
+server.listen(PORT, () => {
+  console.log('CORS-enabled web server');
   console.log(`Сервер запущен на порту ${PORT}`);
 });
 
