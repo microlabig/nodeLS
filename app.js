@@ -46,13 +46,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   }
 // };
 // app.use(allowCrossDomain);
-app.use(cors({
-  origin: '*',
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  credentials: true,
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json'
-}));
+app.use(
+  cors({
+    origin: '*',
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    credentials: true,
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders:
+      'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json'
+  })
+);
 app.use('/', require('./routes'));
 
 // сокет на socket.io (чат)
