@@ -25,6 +25,8 @@ router.patch('/api/profile', ctrlHome.profileUpdate);
 
 router.delete('/api/*/:id', ctrlHome.delete);
 
-router.options('*', ctrlHome.post);
+router.options('*', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin:', '*');
+});
 
 module.exports = router;
