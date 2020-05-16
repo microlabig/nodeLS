@@ -46,7 +46,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   }
 // };
 // app.use(allowCrossDomain);
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}));
 app.use('/', require('./routes'));
 
 // сокет на socket.io (чат)
@@ -54,5 +57,6 @@ socketRun();
 
 // основной сервер
 app.listen(PORT, () => {
+  console.log('CORS-enabled web server');
   console.log(`Сервер запущен на порту ${PORT}`);
 });
