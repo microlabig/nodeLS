@@ -1,6 +1,5 @@
 require('dotenv').config(); // считываем необходимые переменные окружения
 const APP_PORT = process.env.APP_PORT || 3000; // порт сервера
-console.log(process.env.APP_PORT, APP_PORT);
 
 const path = require('path');
 const bodyParser = require('body-parser');
