@@ -7,7 +7,9 @@ const session = require('express-session');
 const cors = require('cors');
 const express = require('express');
 const app = express();
-const socketRun = require('./chat');
+const serverAndSocketRun = require('./chat');
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 // парсинг post запросов от клиента
 app.use(bodyParser.urlencoded({ extended: false })); // ключ: значение
@@ -31,19 +33,22 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public')));
 
 // роутер
-app.use(cors());
+app.use((req, res, next) => {
+  console.log('CORS-enabled web server');
+  cors();
+  next();
+});
 app.use('/', require('./routes'));
 
-// сокет на socket.io (чат)
-// socketRun();
-
 // основной сервер
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log('CORS-enabled web server');
   console.log(`Сервер запущен на порту ${PORT}`);
-  socketRun(app);
 });
+// чат на socket.io
+serverAndSocketRun(io);
 
+// error handler
 app.use((err, req, res, next) => {
   if (err) {
     console.error(err.stack);

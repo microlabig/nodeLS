@@ -1,6 +1,3 @@
-// const SOCKET_PORT = (parseInt(process.env.PORT) + 30).toString(); // порт сокет соединения = (default + 30)
-// const io = require('socket.io').listen(5000); // сокет-сервер
-
 const users = {}; // список пользователей
 const history = {}; // список сообщений
 
@@ -15,9 +12,8 @@ const getSocketId = (userId) => {
   }
 };
 
-module.exports = (server) => {
-  // console.log(`Socket-сервер запущен на порту ${SOCKET_PORT}`);
-  const io = require('socket.io')(server);
+// сокет на socket.io (чат)
+module.exports = (io) => {
   // обработчик соединения нового клиента с сокет-сервером
   io.sockets.on('connection', (socket) => {
     const socketId = socket.id;
