@@ -30,7 +30,7 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public')));
 
 // роутер
-app.use('/', require('./routes/index'));
+app.use('/', require('./routes'));
 
 // сокет на socket.io (чат)
 socketRun();
