@@ -4,6 +4,7 @@ const PORT = process.env.PORT || 3000; // порт сервера
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const cors = require('cors');
 const express = require('express');
 const app = express();
 const socketRun = require('./chat');
@@ -45,7 +46,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   }
 // };
 // app.use(allowCrossDomain);
-
+app.use(cors({
+  origin: '*',
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  credentials: true,
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json'
+}));
 app.use('/', require('./routes'));
 
 // сокет на socket.io (чат)

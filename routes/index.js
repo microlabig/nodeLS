@@ -1,11 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const cors = require('cors');
-
-// app.use(cors({
-//   origin: '*',
-//   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-// }));
 
 const ctrlHome = require('../controllers/home');
 
@@ -24,28 +18,13 @@ router.all('*', (req, res, next) => {
 
 router.get(/.*$/, isAuth, (req, res) => ctrlHome.get(req, res));
 
-router.post(/.*$/, cors({
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}), ctrlHome.post);
+router.post(/.*$/, ctrlHome.post);
 
-router.patch('/api/users/:id/permission', cors({
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}), ctrlHome.userPermissionUpdate);
-router.patch('/api/news/:id', cors({
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}), ctrlHome.newsUpdate);
-router.patch('/api/profile', cors({
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}), ctrlHome.profileUpdate);
+router.patch('/api/users/:id/permission', ctrlHome.userPermissionUpdate);
+router.patch('/api/news/:id', ctrlHome.newsUpdate);
+router.patch('/api/profile', ctrlHome.profileUpdate);
 
-router.delete('/api/*/:id', cors({
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}), ctrlHome.delete);
+router.delete('/api/*/:id', ctrlHome.delete);
 
 // router.options('*', (req, res) => {
 //   res.header('Access-Control-Allow-Origin', '*');
