@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const ctrlHome = require('../controllers/home');
+const ctrl = require('../controllers');
 
 // MW
 const isAuth = (req, res, next) => {
@@ -16,14 +16,14 @@ router.all('*', (req, res, next) => {
   next();
 });
 
-router.get(/.*$/, isAuth, (req, res) => ctrlHome.get(req, res));
+router.get(/.*$/, isAuth, (req, res) => ctrl.get(req, res));
 
-router.post(/.*$/, ctrlHome.post);
+router.post(/.*$/, ctrl.post);
 
-router.patch('/api/users/:id/permission', ctrlHome.userPermissionUpdate);
-router.patch('/api/news/:id', ctrlHome.newsUpdate);
-router.patch('/api/profile', ctrlHome.profileUpdate);
+router.patch('/api/users/:id/permission', ctrl.userPermissionUpdate);
+router.patch('/api/news/:id', ctrl.newsUpdate);
+router.patch('/api/profile', ctrl.profileUpdate);
 
-router.delete('/api/*/:id', ctrlHome.delete);
+router.delete('/api/*/:id', ctrl.delete);
 
 module.exports = router;

@@ -168,7 +168,7 @@ module.exports.profileUpdate = async (req, res, next) => {
 //    DELETE
 // ------------
 module.exports.delete = async (req, res) => {
-  const what = req.url.match(/^\/api\/.{0,5}\/?/)[0];
+  const what = req.url.match(/^\/?API\/.{0,5}\/?/i)[0];
   const id = req.params.id;
   let status = null;
 

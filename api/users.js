@@ -197,7 +197,7 @@ module.exports.deleteUser = async (id) => {
         // удалим аватар удаляемого пользователя
         await unlink(path.join(process.cwd(), 'public', findUser.image));
       }
-      console.log('News deleted:', status);
+      console.log('User deleted:', status);
       return await getUsers();
     } else {
       throw new Error('Ошибка удаления из БД');
