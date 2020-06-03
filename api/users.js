@@ -46,8 +46,7 @@ module.exports.packUserData = async (userObj, options = {}) => {
       },
       surName: userObj.surName,
       username: userObj.username,
-      password: userObj.password,
-      createdAt: new Date(Date.now()).toUTCString()
+      password: userObj.password
     };
   }
   return null;

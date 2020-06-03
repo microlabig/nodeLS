@@ -55,3 +55,12 @@ app.use((err, req, res, next) => {
     next();
   }
 });
+
+// в случае неопределенной ошибки
+process.on('uncaughtException', (err) => {
+  console.error(
+    `${new Date().toUTCString()} uncaught exception: ${err.message}`
+  );
+  console.error(err.stack);
+  process.exit(1);
+});

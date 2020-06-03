@@ -7,27 +7,29 @@ mongoose.Promise = global.Promise; // для работы с Promise
 
 // установка схем
 // объект пользователя
-const userScheme = new Schema({
-  firstName: String,
-  id: {
-    type: Number,
-    required: true
+const userScheme = new Schema(
+  {
+    firstName: String,
+    id: {
+      type: Number,
+      required: true
+    },
+    image: String,
+    middleName: String,
+    permission: {
+      chat: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
+      news: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
+      settings: { C: Boolean, R: Boolean, U: Boolean, D: Boolean }
+    },
+    surName: String,
+    username: String,
+    password: {
+      type: String,
+      required: true
+    }
   },
-  image: String,
-  middleName: String,
-  permission: {
-    chat: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
-    news: { C: Boolean, R: Boolean, U: Boolean, D: Boolean },
-    settings: { C: Boolean, R: Boolean, U: Boolean, D: Boolean }
-  },
-  createdAt: Date,
-  surName: String,
-  username: String,
-  password: {
-    type: String,
-    required: true
-  }
-});
+  { timestamps: true }
+);
 
 // закодируем пароль при сохранении пользователя
 userScheme.pre('save', function (next) {
